@@ -12,19 +12,24 @@ function exibirMensagem(texto, tipo = 'sucesso') {
     }, 3000);
 }
 
-// Função para resetar o formulário
-function resetarFormulario() {
-    document.getElementById('formDoacao').reset();
-    document.getElementById('dataEntrada').value = new Date().toISOString().split('T')[0];
+// Função para controlar as abas
+function abrirAba(evt, nomeAba) {
+    document.querySelectorAll('.aba-conteudo').forEach(aba => aba.classList.remove('active'));
+    document.querySelectorAll('.aba-link').forEach(link => link.classList.remove('active'));
+    
+    document.getElementById(nomeAba).classList.add('active');
+    evt.currentTarget.classList.add('active');
+
+    if(nomeAba === 'estoque') carregarItens();
+    if(nomeAba === 'remocao') carregarItensRemocao();
 }
 
-// Evento de submit do formulário
+// Evento de cadastro simplificado
 document.getElementById('formDoacao').addEventListener('submit', async (e) => {
     e.preventDefault();
     
     const novoItem = {
         item: document.getElementById('item').value,
-        quantidade: parseInt(document.getElementById('quantidade').value),
         tipo: document.getElementById('tipo').value,
         categoria: document.getElementById('categoria').value,
         genero: document.getElementById('genero').value,
@@ -41,110 +46,80 @@ document.getElementById('formDoacao').addEventListener('submit', async (e) => {
             body: JSON.stringify(novoItem)
         });
         
-        if (!response.ok) throw new Error('Falha ao cadastrar');
+        if(!response.ok) throw new Error('Falha no cadastro');
         
         exibirMensagem('Item cadastrado com sucesso!');
-        resetarFormulario();
-        await carregarItens(); // Atualiza a tabela
+        document.getElementById('formDoacao').reset();
+        await carregarItens();
         
-    } catch (error) {
-        exibirMensagem('Erro ao cadastrar item!', 'erro');
-        console.error('Erro:', error);
+    } catch(error) {
+        exibirMensagem(`Erro: ${error.message}`, 'erro');
     }
 });
 
-// Função para carregar itens do estoque
+// Carregamento do estoque
 async function carregarItens() {
     try {
         const response = await fetch('http://localhost:3000/itens');
-        if (!response.ok) throw new Error('Erro ao carregar dados');
-        
         const itens = await response.json();
         atualizarTabela(itens);
-        
-    } catch (error) {
+    } catch(error) {
         exibirMensagem('Falha ao carregar estoque', 'erro');
-        console.error('Erro:', error);
     }
 }
 
-// Função para atualizar a tabela de estoque
+// Atualização da tabela sem quantidade
 function atualizarTabela(itens) {
     const tbody = document.getElementById('corpoTabela');
     tbody.innerHTML = '';
 
     itens.forEach(item => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${item.nome}</td>
-            <td>${item.quantidade}</td>
-            <td>${item.tipo}</td>
-            <td>${item.categoria}</td>
-            <td>${item.genero}</td>
-            <td>${item.tamanho}</td>
-            <td>${item.descricao || '-'}</td>
-            <td>${new Date(item.data_entrada).toLocaleDateString('pt-BR')}</td>
-            <td>${item.doador}</td>
+        tbody.innerHTML += `
+            <tr>
+                <td>${item.nome}</td>
+                <td>${item.tipo}</td>
+                <td>${item.categoria}</td>
+                <td>${item.genero}</td>
+                <td>${item.tamanho}</td>
+                <td>${item.descricao || '-'}</td>
+                <td>${new Date(item.data_entrada).toLocaleDateString('pt-BR')}</td>
+                <td>${item.doador}</td>
+            </tr>
         `;
-        tbody.appendChild(tr);
     });
 }
 
-// Validações em tempo real
-document.querySelectorAll('#formDoacao input, #formDoacao select').forEach(input => {
-    input.addEventListener('input', () => {
-        input.setCustomValidity('');
-    });
-});
+// Remoção simplificada
+document.getElementById('formRemocao').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const itemId = document.getElementById('itemRemover').value;
+    if(!itemId) return exibirMensagem('Selecione um item', 'erro');
 
-// Validação específica para quantidade
-document.getElementById('quantidade').addEventListener('input', (e) => {
-    if (e.target.value < 1) {
-        e.target.setCustomValidity('A quantidade deve ser pelo menos 1');
-    } else {
-        e.target.setCustomValidity('');
+    const itemSelecionado = document.getElementById('itemRemover').selectedOptions[0].textContent;
+    
+    // Confirmação reforçada
+    const confirmacao = confirm(`⚠️ ATENÇÃO!\n\nTem certeza que deseja remover permanentemente:\n"${itemSelecionado}"?\n\nEsta ação não pode ser desfeita!`);
+    
+    if(!confirmacao) {
+        return exibirMensagem('❌ Item NÃO removido: Ação cancelada pelo usuário', 'aviso');
+    }
+
+    try {
+        const response = await fetch(`http://localhost:3000/itens/${itemId}`, {
+            method: 'DELETE'
+        });
+
+        if(!response.ok) throw new Error('Falha na comunicação com o servidor');
+        
+        exibirMensagem('✅ Item removido com sucesso!');
+        carregarItensRemocao();
+        carregarItens();
+        
+    } catch(error) {
+        exibirMensagem(`❌ Erro crítico: ${error.message}`, 'erro');
     }
 });
-
-// Validação para selects
-document.querySelectorAll('#formDoacao select').forEach(select => {
-    select.addEventListener('change', () => {
-        if (select.value === '') {
-            select.setCustomValidity('Selecione uma opção válida');
-        } else {
-            select.setCustomValidity('');
-        }
-    });
-});
-
-// Carregar dados iniciais
-document.addEventListener('DOMContentLoaded', () => {
-    // Configurar data atual
-    document.getElementById('dataEntrada').value = new Date().toISOString().split('T')[0];
-    
-    // Carregar estoque inicial
-    carregarItens();
-});
-
-function abrirAba(evt, nomeAba) {
-    // Remove classe active de todas as abas e links
-    document.querySelectorAll('.aba-conteudo').forEach(aba => {
-        aba.classList.remove('active');
-    });
-    document.querySelectorAll('.aba-link').forEach(link => {
-        link.classList.remove('active');
-    });
-    
-    // Adiciona classe active na aba e link selecionados
-    document.getElementById(nomeAba).classList.add('active');
-    evt.currentTarget.classList.add('active');
-
-    // Se for a aba de estoque, atualiza a tabela
-    if(nomeAba === 'estoque') carregarItens();
-    
-    // Se for a aba de remoção, carrega os itens no select
-    if(nomeAba === 'remocao') carregarItensRemocao();
-}
 
 // Carregar itens para remoção
 async function carregarItensRemocao() {
@@ -158,36 +133,16 @@ async function carregarItensRemocao() {
         itens.forEach(item => {
             const option = document.createElement('option');
             option.value = item.id;
-            option.textContent = `${item.nome} (${item.tamanho}) - ${item.quantidade} unid.`;
+            option.textContent = `${item.nome} (${item.tipo} - ${item.tamanho})`;
             select.appendChild(option);
         });
-    } catch (error) {
-        exibirMensagem('Erro ao carregar itens para remoção', 'erro');
+    } catch(error) {
+        exibirMensagem('Erro ao carregar itens', 'erro');
     }
 }
 
-// Evento de remoção
-document.getElementById('formRemocao').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const dados = {
-        id: document.getElementById('itemRemover').value,
-        quantidade: parseInt(document.getElementById('quantidadeRemover').value)
-    };
-
-    try {
-        const response = await fetch('http://localhost:3000/itens', {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(dados)
-        });
-
-        if (!response.ok) throw new Error('Falha na remoção');
-        
-        exibirMensagem('Item removido com sucesso!');
-        carregarItensRemocao();
-        abrirAba({ currentTarget: document.querySelector('[onclick*="estoque"]') }, 'estoque');
-    } catch (error) {
-        exibirMensagem(error.message, 'erro');
-    }
+// Configuração inicial
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('dataEntrada').value = new Date().toISOString().split('T')[0];
+    carregarItens();
 });

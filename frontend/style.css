@@ -182,3 +182,28 @@ textarea {
 .btn-remover:hover {
     background-color: #d32f2f !important;
 }
+
+/*Estilo da mensagem ao cancelar a remoção de uma doação*/
+.mensagem.aviso {
+    background-color: #ffc107;
+    color: #000;
+    border: 2px solid #ff9800;
+}
+
+/*Estilo da letra dentro do formulário tipo de cadastro de doacao*/
+optgroup {
+    font-style: normal;
+    font-weight: bold;
+    color: #262525;
+}
+optgroup option {
+    font-weight: normal;
+    color: #262525;
+}
+
+select option[value="Infantil"] {
+    font-weight: bold;
+    color: #e91e63;
+}
+
+

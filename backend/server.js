@@ -27,8 +27,7 @@ pool.query('SELECT NOW()', (err, res) => {
 // Cadastrar novo item
 app.post('/itens', (req, res) => {
     const { 
-        item: nome, 
-        quantidade, 
+        item: nome,  
         tipo, 
         categoria, 
         genero, 
@@ -42,7 +41,7 @@ app.post('/itens', (req, res) => {
     const validacoes = {
         tipo: ['Calça', 'Camiseta', 'Tênis', 'Blusa', 'Luvas', 'Gorro'],
         categoria: ['Frio', 'Calor'],
-        genero: ['Masculino', 'Feminino', 'Unissex'],
+        genero: ['Masculino', 'Feminino', 'Unissex', 'Infantil'],
         tamanho: ['P', 'M', 'G', 'GG']
     };
 
@@ -60,13 +59,12 @@ app.post('/itens', (req, res) => {
     // Query SQL
     const sql = `
         INSERT INTO itens 
-            (nome, quantidade, tipo, categoria, genero, tamanho, data_entrada, doador, descricao) 
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) 
+            (nome, tipo, categoria, genero, tamanho, data_entrada, doador, descricao) 
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8) 
         RETURNING *`;
 
     pool.query(sql, [
         nome,
-        quantidade,
         tipo,
         categoria,
         genero,
@@ -95,33 +93,59 @@ app.get('/itens', (req, res) => {
     });
 });
 
-// Rotas para saídas (a implementar)
-app.post('/saidas', (req, res) => {
-    // Lógica para registrar saídas
-});
-
-app.listen(3000, () => {
-    console.log('Servidor rodando na porta 3000');
-});
-
-
-app.delete('/itens', (req, res) => {
-    const { id, quantidade } = req.body;
+// Remover um item (remoção total)
+app.delete('/itens/:id', (req, res) => {
+    const itemId = req.params.id;
     
+    const sql = 'DELETE FROM itens WHERE id = $1 RETURNING *';
+    
+    pool.query(sql, [itemId], (err, result) => {
+        if (err) return res.status(500).json({ error: "Erro ao remover item" });
+        if (result.rowCount === 0) return res.status(404).json({ error: "Item não encontrado" });
+        res.json({ success: true, removedItem: result.rows[0] });
+    });
+});
+
+// Reduzir a quantidade de um item (e remover se chegar a zero)
+app.put('/itens/reduzir/:id', (req, res) => {
+    const itemId = req.params.id;
+    const { quantidade } = req.body;
+
+    // Query para reduzir a quantidade
     const sql = `
         UPDATE itens 
         SET quantidade = GREATEST(quantidade - $1, 0)
         WHERE id = $2
         RETURNING *`;
-    
-    pool.query(sql, [quantidade, id], (err, result) => {
-        if (err) return res.status(500).json({ error: err.message });
-        
-        if (result.rows[0].quantidade === 0) {
-            // Remove o item se a quantidade chegar a zero
-            pool.query('DELETE FROM itens WHERE id = $1', [id]);
+
+    pool.query(sql, [quantidade, itemId], (err, result) => {
+        if (err) {
+            console.error('Erro ao reduzir quantidade:', err);
+            return res.status(500).json({ error: 'Erro ao reduzir quantidade' });
         }
-        
-        res.json({ message: 'Item atualizado com sucesso' });
+
+        if (result.rowCount === 0) {
+            return res.status(404).json({ error: 'Item não encontrado' });
+        }
+
+        const itemAtualizado = result.rows[0];
+
+        // Se a quantidade chegou a zero, remove o item
+        if (itemAtualizado.quantidade === 0) {
+            pool.query('DELETE FROM itens WHERE id = $1', [itemId], (err) => {
+                if (err) {
+                    console.error('Erro ao remover item:', err);
+                    return res.status(500).json({ error: 'Erro ao remover item' });
+                }
+                res.json({ message: 'Item removido com sucesso (quantidade zerada)', item: itemAtualizado });
+            });
+        } else {
+            res.json({ message: 'Quantidade reduzida com sucesso', item: itemAtualizado });
+        }
     });
+});
+
+// Iniciar o servidor
+app.listen(3000, () => {
+    console.log('Servidor rodando na porta 3000');
 });
