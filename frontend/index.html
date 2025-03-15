@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Doações</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Controle de Doações</h1>
+        <div id="mensagens"></div>
+
+        <!-- Menu de Abas -->
+        <div class="abas-menu">
+            <button class="aba-link active" onclick="abrirAba(event, 'cadastro')">Nova Doação</button>
+            <button class="aba-link" onclick="abrirAba(event, 'estoque')">Estoque</button>
+            <button class="aba-link" onclick="abrirAba(event, 'remocao')">Remover Item</button>
+        </div>
+
+        <!-- Conteúdo das Abas -->
+        <div id="cadastro" class="aba-conteudo active">
+            <h2>Cadastrar Nova Doação</h2>
+            <form id="formDoacao">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="item">Nome do Item</label>
+                        <input type="text" id="item" placeholder="Ex: Casaco de Inverno" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantidade">Quantidade</label>
+                        <input type="number" id="quantidade" min="1" value="1" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="tipo">Tipo</label>
+                        <select id="tipo" required>
+                            <option value="">Selecione...</option>
+                            <option>Calça</option>
+                            <option>Camiseta</option>
+                            <option>Tênis</option>
+                            <option>Blusa</option>
+                            <option>Luvas</option>
+                            <option>Gorro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="categoria">Categoria</label>
+                        <select id="categoria" required>
+                            <option value="">Selecione...</option>
+                            <option>Frio</option>
+                            <option>Calor</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="genero">Gênero</label>
+                        <select id="genero" required>
+                            <option value="">Selecione...</option>
+                            <option>Masculino</option>
+                            <option>Feminino</option>
+                            <option>Unissex</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="tamanho">Tamanho</label>
+                        <select id="tamanho" required>
+                            <option value="">Selecione...</option>
+                            <option>P</option>
+                            <option>M</option>
+                            <option>G</option>
+                            <option>GG</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="dataEntrada">Data de Entrada</label>
+                    <input type="date" id="dataEntrada" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="doador">Doador</label>
+                    <input type="text" id="doador" placeholder="Nome do doador" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="descricao">Descrição (opcional)</label>
+                    <textarea id="descricao" rows="2" placeholder="Ex: Casaco azul com zíper frontal"></textarea>
+                </div>
+
+                <button type="submit">Cadastrar Doação</button>
+            </form>
+        </div>
+
+        <!-- Aba de Estoque -->
+        <div id="estoque" class="aba-conteudo">
+            <div class="section">
+                <h2>Estoque Atual 
+                    <button onclick="carregarItens()" class="btn-atualizar">↻ Atualizar</button>
+                </h2>
+                <div class="tabela-container">
+                    <table id="tabelaEstoque">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Quantidade</th>
+                                <th>Tipo</th>
+                                <th>Categoria</th>
+                                <th>Gênero</th>
+                                <th>Tamanho</th>
+                                <th>Descrição</th>
+                                <th>Data Entrada</th>
+                                <th>Doador</th>
+                            </tr>
+                        </thead>
+                        <tbody id="corpoTabela">
+                            <!-- Dados serão preenchidos via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aba de Remoção -->
+        <div id="remocao" class="aba-conteudo">
+            <div class="section">
+                <h2>Remover Item do Estoque</h2>
+                <form id="formRemocao">
+                    <div class="form-group">
+                        <label for="itemRemover">Selecione o Item:</label>
+                        <select id="itemRemover" required></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantidadeRemover">Quantidade a Remover:</label>
+                        <input type="number" id="quantidadeRemover" min="1" required>
+                    </div>
+                    <button type="submit" class="btn-remover">Confirmar Remoção</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
