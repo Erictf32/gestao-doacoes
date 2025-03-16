@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestão de Doações</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <div class="container">
@@ -17,7 +18,7 @@
             <button class="aba-link" onclick="abrirAba(event, 'estoque')">Estoque</button>
             <button class="aba-link" onclick="abrirAba(event, 'remocao')">Remover Item</button>
         </div>
-
+        
         <!-- Aba de Cadastro -->
         <div id="cadastro" class="aba-conteudo active">
             <div class="section">
@@ -66,7 +67,7 @@
                                 <option>Masculino</option>
                                 <option>Feminino</option>
                                 <option>Unissex</option>
-                                <option>Infantil</option> <!-- Nova opção adicionada -->
+                                <option>Infantil</option>
                             </select>
                         </div>
                         <div class="form-group">
@@ -83,7 +84,7 @@
 
                     <div class="form-group">
                         <label for="dataEntrada">Data de Entrada</label>
-                        <input type="date" id="dataEntrada" required>
+                        <input type="date" id="dataEntrada" required max="">
                     </div>
 
                     <div class="form-group">
@@ -107,6 +108,34 @@
                 <h2>Estoque Atual 
                     <button onclick="carregarItens()" class="btn-atualizar">↻ Atualizar</button>
                 </h2>
+
+                <!-- Filtros de Estoque -->
+                <div class="filtros-estoque">
+                    <div class="filtro">
+                        <label>Tamanho:</label>
+                        <select id="filtroTamanho" multiple>
+                            <option value="P">P</option>
+                            <option value="M">M</option>
+                            <option value="G">G</option>
+                            <option value="GG">GG</option>
+                        </select>
+                    </div>
+
+                    <div class="filtro">
+                        <label>Gênero:</label>
+                        <select id="filtroGenero" multiple>
+                            <option>Masculino</option>
+                            <option>Feminino</option>
+                            <option>Unissex</option>
+                            <option>Infantil</option>
+                        </select>
+                    </div>
+
+                    <button onclick="aplicarFiltros()" class="btn-filtrar">🔍 Aplicar Filtros</button>
+                    <button onclick="limparFiltros()" class="btn-limpar">🗑️ Limpar</button>
+                </div>
+
+                <!-- Tabela de Estoque -->
                 <div class="tabela-container">
                     <table id="tabelaEstoque">
                         <thead>
@@ -148,4 +177,4 @@
 
     <script src="app.js"></script>
 </body>
-</html> 
+</html>

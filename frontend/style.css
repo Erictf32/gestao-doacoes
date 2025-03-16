@@ -1,10 +1,31 @@
-body {
-    font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 20px;
-    background-color: #f0f0f0;
+:root {
+    --cor-primaria: #4CAF50;       /* Verde principal */
+    --cor-secundaria: #45a049;     /* Verde escuro */
+    /*--cor-secundaria: #45a049;     /* Verde escuro */
+    --cor-fundo: #f5f5f5;          /* Fundo claro */
+    --cor-texto: #333;             /* Texto escuro */
+    --cor-destaque: #ff6f61;       /* Coral para destaques */
+    --cor-borda: #ddd;             /* Bordas suaves */
+    --sombra: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra padrão */
 }
 
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+body {
+    background-color: var(--cor-fundo);
+    color: var(--cor-texto);
+    line-height: 1.6;
+    padding: 20px;
+}
+h1, h2, h3 {
+    color: var(--cor-primaria);
+    margin-bottom: 20px;
+    font-size: 35px;
+}
 .container {
     max-width: 800px;
     margin: 0 auto;
@@ -26,13 +47,17 @@ input, select, button {
 }
 
 button {
-    background-color: #4CAF50;
+    background-color: var(--cor-primaria);
     color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s;
 }
 
 button:hover {
-    background-color: #45a049;
+    background-color: var(--cor-secundaria);
 }
 
 #estoque {
@@ -75,6 +100,7 @@ button:hover {
 
 .tabela-container {
     overflow-x: auto;
+    margin-bottom: 20px;
 }
 
 table {
@@ -86,16 +112,15 @@ table {
 th, td {
     padding: 12px;
     text-align: left;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid var(--cor-borda);
 }
-
 th {
-    background-color: #4CAF50;
+    background-color: var(--cor-primaria);
     color: white;
 }
 
 tr:hover {
-    background-color: #f5f5f5;
+    background-color: rgba(76, 175, 80, 0.1);
 }
 
 .btn-atualizar {
@@ -120,13 +145,29 @@ tr:hover {
 }
 
 .form-group {
-    flex: 1;
+    margin-bottom: 15px;
 }
 
 .form-group label {
     display: block;
     margin-bottom: 5px;
     font-weight: bold;
+    color: var(--cor-primaria);
+}
+
+.form-group input, .form-group select, .form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid var(--cor-borda);
+    border-radius: 5px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: var(--cor-primaria);
+    outline: none;
+    box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
 }
 
 textarea {
@@ -140,7 +181,7 @@ textarea {
 .abas-menu {
     display: flex;
     margin-bottom: 20px;
-    border-bottom: 2px solid #4CAF50;
+    border-bottom: 2px solid var(--cor-borda);
 }
 
 .aba-link {
@@ -150,16 +191,13 @@ textarea {
     cursor: pointer;
     font-size: 16px;
     transition: all 0.3s;
+    color: var(--cor-texto);
+    border-bottom: 3px solid transparent;
 }
 
-.aba-link:hover {
-    background-color: #f0f0f0;
-}
-
-.aba-link.active {
-    background-color: #4CAF50;
-    color: white;
-    border-radius: 5px 5px 0 0;
+.aba-link:hover, .aba-link.active {
+    color: var(--cor-primaria);
+    border-bottom: 3px solid var(--cor-primaria);
 }
 
 .aba-conteudo {
@@ -207,3 +245,11 @@ select option[value="Infantil"] {
 }
 
 
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: var(--sombra);
+}
