@@ -9,7 +9,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>Controle de Doações</h1>
+        <h1 id="titulo_princ">Controle de Doações <br> Garimpando o Amor</h1>
         <div id="mensagens"></div>
 
         <!-- Menu de Abas -->
@@ -20,87 +20,98 @@
         </div>
         
         <!-- Aba de Cadastro -->
-        <div id="cadastro" class="aba-conteudo active">
-            <div class="section">
-                <h2>Cadastrar Nova Doação</h2>
-                <form id="formDoacao">
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="item">Nome do Item</label>
-                            <input type="text" id="item" placeholder="Ex: Macacão Infantil" required>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="tipo">Tipo</label>
-                            <select id="tipo" required>
-                                <option value="">Selecione o tipo...</option>
-                                <optgroup label="Roupas">
-                                    <option>Calça</option>
-                                    <option>Camiseta</option>
-                                    <option>Blusa</option>
-                                    <option>Vestido</option>
-                                </optgroup>
-                                <optgroup label="Calçados">
-                                    <option>Tênis</option>
-                                    <option>Bota</option>
-                                    <option>Chinelo</option>
-                                </optgroup>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="categoria">Categoria</label>
-                            <select id="categoria" required>
-                                <option value="">Selecione...</option>
-                                <option>Frio</option>
-                                <option>Calor</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="genero">Gênero</label>
-                            <select id="genero" required>
-                                <option value="">Selecione...</option>
-                                <option>Masculino</option>
-                                <option>Feminino</option>
-                                <option>Unissex</option>
-                                <option>Infantil</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="tamanho">Tamanho</label>
-                            <select id="tamanho" required>
-                                <option value="">Selecione...</option>
-                                <option>P</option>
-                                <option>M</option>
-                                <option>G</option>
-                                <option>GG</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="dataEntrada">Data de Entrada</label>
-                        <input type="date" id="dataEntrada" required max="">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="doador">Doador</label>
-                        <input type="text" id="doador" placeholder="Nome do doador" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="descricao">Descrição (opcional)</label>
-                        <textarea id="descricao" rows="2" placeholder="Ex: Macacão azul com estampa de dinossauro"></textarea>
-                    </div>
-
-                    <button type="submit">Cadastrar Doação</button>
-                </form>
+<div id="cadastro" class="aba-conteudo active">
+    <div class="section">
+        <h2>Cadastrar Nova Doação</h2>
+        <form id="formDoacao">
+            <!-- Linha 1: Nome do Item -->
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label for="item">Nome do Item</label>
+                    <input type="text" id="item" placeholder="Ex: Macacão Infantil" required>
+                </div>
             </div>
-        </div>
+
+            <!-- Linha 2: Tipo e Categoria -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="tipo">Tipo</label>
+                    <select id="tipo" required>
+                        <option value="">Selecione o tipo...</option>
+                        <optgroup label="Roupas">
+                            <option>Calça</option>
+                            <option>Camiseta</option>
+                            <option>Blusa</option>
+                            <option>Vestido</option>
+                        </optgroup>
+                        <optgroup label="Calçados">
+                            <option>Tênis</option>
+                            <option>Bota</option>
+                            <option>Chinelo</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="categoria">Categoria</label>
+                    <select id="categoria" required>
+                        <option value="">Selecione...</option>
+                        <option>Frio</option>
+                        <option>Calor</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Linha 3: Gênero e Tamanho -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="genero">Gênero</label>
+                    <select id="genero" required>
+                        <option value="">Selecione...</option>
+                        <option>Masculino</option>
+                        <option>Feminino</option>
+                        <option>Unissex</option>
+                        <option>Infantil</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="tamanho">Tamanho</label>
+                    <select id="tamanho" required>
+                        <option value="">Selecione...</option>
+                        <option>P</option>
+                        <option>M</option>
+                        <option>G</option>
+                        <option>GG</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Linha 4: Data de Entrada e Doador -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="dataEntrada">Data de Entrada</label>
+                    <input type="date" id="dataEntrada" required max="">
+                </div>
+                <div class="form-group">
+                    <label for="doador">Doador</label>
+                    <input type="text" id="doador" placeholder="Nome do doador" required>
+                </div>
+            </div>
+
+            <!-- Linha 5: Descrição -->
+            <div class="form-row">
+                <div class="form-group full-width">
+                    <label for="descricao">Descrição (opcional)</label>
+                    <textarea id="descricao" rows="3" placeholder="Ex: Macacão azul com estampa de dinossauro"></textarea>
+                </div>
+            </div>
+
+            <!-- Botão de Cadastro -->
+            <div class="form-row">
+                <button type="submit">Cadastrar Doação</button>
+            </div>
+        </form>
+    </div>
+</div>
 
         <!-- Aba de Estoque -->
         <div id="estoque" class="aba-conteudo">
@@ -159,19 +170,30 @@
         </div>
 
         <!-- Aba de Remoção -->
-        <div id="remocao" class="aba-conteudo">
-            <div class="section">
-                <h2>Remover Item do Estoque</h2>
-                <form id="formRemocao">
-                    <div class="form-group">
-                        <label for="itemRemover">Selecione o Item:</label>
-                        <select id="itemRemover" required>
-                            <option value="">Carregando itens...</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="btn-remover">Confirmar Remoção</button>
-                </form>
+
+<div id="remocao" class="aba-conteudo">
+    <div class="section">
+        <h2>Remover Item do Estoque</h2>
+        <form id="formRemocao">
+            <div class="form-group">
+                <label for="buscaItem">Buscar Item:</label>
+                <input type="text" id="buscaItem" placeholder="Digite parte do nome do item...">
             </div>
+            
+            <div class="form-group">
+                <label for="itemRemover">Selecione o Item:</label>
+                <select id="itemRemover" required size="8">
+                    <!-- Remova a opção padrão -->
+                </select>
+            </div>
+            
+            <button type="submit" class="btn-remover">Confirmar Remoção</button>
+        </form>
+    </div>
+</div>
+        <!-- Spinner de Carregamento -->
+        <div id="loading" class="loading-spinner" style="display: none;">
+            <i class="fas fa-spinner fa-spin"></i> Carregando...
         </div>
     </div>
 

@@ -62,6 +62,13 @@ document.getElementById('formDoacao').addEventListener('submit', async (e) => {
 
 // Carregamento do estoque com filtros
 async function carregarItens() {
+    /*
+    const params = new URLSearchParams();
+    
+    if (tamanhos && tamanhos.length > 0) params.append('tamanhos', tamanhos.join(','));
+    if (generos && generos.length > 0) params.append('generos', generos.join(','));
+    */
+    mostrarCarregamento();
     try {
         const tamanhos = Array.from(document.getElementById('filtroTamanho').selectedOptions)
             .map(option => option.value)
@@ -94,6 +101,8 @@ async function carregarItens() {
         console.error('Erro ao carregar estoque:', error); // Depuração
         exibirMensagem('Falha ao carregar estoque', 'erro');
         atualizarTabela([]); // Força tabela vazia
+    }finally {
+        esconderCarregamento();
     }
 }
 
@@ -167,27 +176,47 @@ document.getElementById('formRemocao').addEventListener('submit', async (e) => {
         exibirMensagem(`❌ Erro crítico: ${error.message}`, 'erro');
     }
 });
-
+let todosItensRemocao = [];
 // Carregar itens para remoção
 async function carregarItensRemocao() {
     try {
         const response = await fetch('http://localhost:3000/itens');
-        const dados = await response.json(); //  Captura o objeto completo
-        const itens = dados.itens || []; // Extrai o array de itens
-        
-        const select = document.getElementById('itemRemover');
-        select.innerHTML = '<option value="">Selecione um item</option>';
-        
-        itens.forEach(item => {
-            const option = document.createElement('option');
-            option.value = item.id;
-            option.textContent = `${item.nome} (${item.tipo} - ${item.tamanho})`;
-            select.appendChild(option);
-        });
+        const dados = await response.json();
+        todosItensRemocao = dados.itens || [];
+        filtrarItensRemocao(); // Carrega todos inicialmente
     } catch(error) {
         exibirMensagem('Erro ao carregar itens', 'erro');
     }
 }
+function filtrarItensRemocao() {
+    const termoBusca = document.getElementById('buscaItem').value.toLowerCase();
+    const select = document.getElementById('itemRemover');
+    
+    // Limpa o select (sem adicionar a opção padrão)
+    select.innerHTML = '';
+
+    // Filtra os itens
+    const itensFiltrados = todosItensRemocao.filter(item => 
+        item.nome.toLowerCase().includes(termoBusca)
+    );
+
+    // Preenche o select com os itens filtrados
+    itensFiltrados.forEach(item => {
+        const option = document.createElement('option');
+        option.value = item.id;
+        option.textContent = `${item.nome} (${item.tipo} - ${item.tamanho})`;
+        select.appendChild(option);
+    });
+
+    // Se não houver itens, exibe uma mensagem
+    if (itensFiltrados.length === 0) {
+        const option = document.createElement('option');
+        option.textContent = "Nenhum item encontrado";
+        option.disabled = true;
+        select.appendChild(option);
+    }
+}
+document.getElementById('buscaItem').addEventListener('input', filtrarItensRemocao);
 
 // Configuração inicial
 document.addEventListener('DOMContentLoaded', () => {
@@ -226,4 +255,12 @@ function limparFiltros() {
 
     // Recarrega os itens sem filtros
     carregarItens();
+}
+
+function mostrarCarregamento() {
+    document.getElementById('loading').style.display = 'flex';
+}
+
+function esconderCarregamento() {
+    document.getElementById('loading').style.display = 'none';
 }

@@ -8,7 +8,40 @@
     --cor-borda: #ddd;             /* Bordas suaves */
     --sombra: 0 4px 6px rgba(0, 0, 0, 0.1); /* Sombra padrão */
 }
+#titulo_princ {
+    font-size: 3rem;
+    color: var(--cor-primaria);
+    text-align: center;
+    margin: 20px 0;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-family: 'Poppins', sans-serif;
+    position: relative;
+    display: inline-block;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(45deg, #5ac95e, #2196F3);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    animation: fadeIn 1s ease-out;
+    
+}
+#titulo_princ::after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 4px;
+    background-color: var(--cor-primaria);
+    margin: 10px auto 0;
+    border-radius: 2px;
+}
 
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px) translateX(-50%); }
+    to { opacity: 1; transform: translateY(0) translateX(-50%); }
+}
 * {
     margin: 0;
     padding: 0;
@@ -26,6 +59,7 @@ h1, h2, h3 {
     margin-bottom: 20px;
     font-size: 35px;
 }
+
 .container {
     max-width: 800px;
     margin: 0 auto;
@@ -137,15 +171,24 @@ tr:hover {
     }
 }
 
-
+#formDoacao {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Espaçamento entre as linhas */
+}
 .form-row {
     display: flex;
     gap: 15px;
-    margin-bottom: 10px;
 }
 
 .form-group {
-    margin-bottom: 15px;
+    flex: 1; /* Distribui o espaço igualmente */
+    display: flex;
+    flex-direction: column;
+    gap: 5px; 
+}
+.form-group.full-width {
+    flex: 100%; /* Ocupa toda a largura da linha */
 }
 
 .form-group label {
@@ -158,16 +201,31 @@ tr:hover {
 .form-group input, .form-group select, .form-group textarea {
     width: 100%;
     padding: 10px;
-    border: 1px solid var(--cor-borda);
+    border: 2px solid var(--cor-borda);
     border-radius: 5px;
     font-size: 16px;
-    transition: border-color 0.3s;
+    transition: border-color 0.3s, box-shadow 0.3s;
 }
 
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
     border-color: var(--cor-primaria);
     outline: none;
     box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+}
+
+#formDoacao button {
+    background-color: var(--cor-primaria);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#formDoacao button:hover {
+    background-color: var(--cor-secundaria);
 }
 
 textarea {
@@ -182,23 +240,36 @@ textarea {
     display: flex;
     margin-bottom: 20px;
     border-bottom: 2px solid var(--cor-borda);
+    gap: 10px; /* Espaçamento entre os botões */
 }
 
+/* Estilo para os botões das abas */
 .aba-link {
     padding: 15px 25px;
     background: none;
     border: none;
     cursor: pointer;
     font-size: 16px;
-    transition: all 0.3s;
+    transition: color 0.3s, border-bottom 0.3s, background-color 0.3s; /* Apenas essas propriedades */
     color: var(--cor-texto);
     border-bottom: 3px solid transparent;
+    min-width: 120px; /* Largura mínima para evitar ajustes */
+    text-align: center; /* Centraliza o texto */
+    flex: 1; /* Distribui o espaço igualmente entre os botões */
 }
 
+/* Efeito de hover e aba ativa */
 .aba-link:hover, .aba-link.active {
     color: var(--cor-primaria);
     border-bottom: 3px solid var(--cor-primaria);
+    background-color: rgba(76, 175, 80, 0.1); /* Fundo verde claro */
 }
+
+/* Estilo para a aba ativa */
+.aba-link.active {
+    font-weight: bold; /* Negrito sem transição */
+}
+
 
 .aba-conteudo {
     display: none;
@@ -252,4 +323,188 @@ select option[value="Infantil"] {
     padding: 20px;
     border-radius: 10px;
     box-shadow: var(--sombra);
+}
+
+.loading-spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: var(--sombra);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 18px;
+    color: var(--cor-primaria);
+}
+
+.fa-spinner {
+    font-size: 24px;
+    color: var(--cor-primaria);
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Estilo para o campo de busca */
+#buscaItem {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 2px solid var(--cor-primaria);
+    border-radius: 5px;
+}
+
+/* Estilo para o select com scroll */
+#itemRemover {
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+/* Estilo para o campo de busca */
+#buscaItem {
+    width: 100%;
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    border: 2px solid var(--cor-primaria);
+    border-radius: 25px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    background: white url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%234CAF50"><path d="M10 2a8 8 0 105.293 14.707l4.707 4.707 1.414-1.414-4.707-4.707A8 8 0 0010 2zm0 2a6 6 0 110 12 6 6 0 010-12z"/></svg>') no-repeat 95% center;
+    background-size: 20px;
+}
+
+#buscaItem:focus {
+    border-color: var(--cor-secundaria);
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+}
+
+#buscaItem::placeholder {
+    color: #999;
+    font-style: italic;
+}
+
+/* Estilo para o select */
+#itemRemover {
+    width: 100%;
+    max-height: 200px;
+    padding: 10px;
+    border: 2px solid var(--cor-primaria);
+    border-radius: 10px;
+    font-size: 16px;
+    background-color: white;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    appearance: none; /* Remove o estilo padrão do select */
+    overflow-y: auto;
+}
+
+#itemRemover:focus {
+    border-color: var(--cor-secundaria);
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+}
+
+/* Estilo para as opções do select */
+#itemRemover option {
+    padding: 10px;
+    border-bottom: 1px solid var(--cor-borda);
+    transition: background-color 0.3s;
+}
+
+#itemRemover option:hover {
+    background-color: rgba(76, 175, 80, 0.1);
+}
+
+#itemRemover option:checked {
+    background-color: var(--cor-primaria);
+    color: white;
+}
+
+/* Estilo para o container do select */
+.form-group {
+    position: relative;
+}
+
+/* Ícone de seta personalizado */
+.form-group::after {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--cor-primaria);
+    font-size: 12px;
+}
+
+/* Estilo para o select múltiplo */
+select[multiple] {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid var(--cor-primaria);
+    border-radius: 10px;
+    font-size: 16px;
+    background-color: white;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    appearance: none; /* Remove o estilo padrão do select */
+    overflow-y: auto;
+    max-height: 150px; /* Altura máxima para evitar que ocupe muito espaço */
+}
+
+select[multiple]:focus {
+    border-color: var(--cor-secundaria);
+    box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+}
+
+/* Estilo para as opções do select */
+select[multiple] option {
+    padding: 10px;
+    border-bottom: 1px solid var(--cor-borda);
+    transition: background-color 0.3s, color 0.3s;
+    cursor: pointer;
+}
+
+/* Efeito de hover nas opções */
+select[multiple] option:hover {
+    background-color: rgba(76, 175, 80, 0.1);
+}
+
+/* Opções selecionadas */
+select[multiple] option:checked {
+    background-color: var(--cor-primaria);
+    color: white;
+    font-weight: bold;
+}
+
+/* Ícone de checkmark para opções selecionadas */
+select[multiple] option:checked::after {
+    content: '✓';
+    margin-left: 10px;
+    color: white;
+}
+
+/* Estilo para o container do select */
+.form-group {
+    position: relative;
+}
+
+/* Seta personalizada (opcional) */
+.form-group::after {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--cor-primaria);
+    font-size: 12px;
 }
