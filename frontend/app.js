@@ -20,8 +20,8 @@ function abrirAba(evt, nomeAba) {
     document.getElementById(nomeAba).classList.add('active');
     evt.currentTarget.classList.add('active');
 
-    if(nomeAba === 'estoque') carregarItens();
-    if(nomeAba === 'remocao') carregarItensRemocao();
+    if (nomeAba === 'estoque') carregarItens();
+    if (nomeAba === 'remocao') carregarItensRemocao();
 }
 
 // Evento de cadastro simplificado
@@ -62,25 +62,25 @@ document.getElementById('formDoacao').addEventListener('submit', async (e) => {
 
 // Carregamento do estoque com filtros
 async function carregarItens() {
-    /*
-    const params = new URLSearchParams();
-    
-    if (tamanhos && tamanhos.length > 0) params.append('tamanhos', tamanhos.join(','));
-    if (generos && generos.length > 0) params.append('generos', generos.join(','));
-    */
     mostrarCarregamento();
     try {
+        // Coletar valores dos TRÊS filtros
         const tamanhos = Array.from(document.getElementById('filtroTamanho').selectedOptions)
             .map(option => option.value)
-            .filter(v => v); // Remove valores vazios
+            .filter(v => v);
 
         const generos = Array.from(document.getElementById('filtroGenero').selectedOptions)
+            .map(option => option.value)
+            .filter(v => v);
+
+        const tipos = Array.from(document.getElementById('filtroTipo').selectedOptions) // Novo
             .map(option => option.value)
             .filter(v => v);
 
         const params = new URLSearchParams();
         if (tamanhos.length > 0) params.append('tamanhos', tamanhos.join(','));
         if (generos.length > 0) params.append('generos', generos.join(','));
+        if (tipos.length > 0) params.append('tipos', tipos.join(',')); // Novo
 
         const response = await fetch(`http://localhost:3000/itens?${params}`);
         
@@ -90,18 +90,14 @@ async function carregarItens() {
         }
 
         const dados = await response.json();
-        console.log('Dados recebidos:', dados); // Depuração
-        
-        // Garante que "itens" seja um array (mesmo que vazio)
         const itens = dados.itens || [];
-
         atualizarTabela(itens);
 
     } catch(error) {
-        console.error('Erro ao carregar estoque:', error); // Depuração
+        console.error('Erro ao carregar estoque:', error);
         exibirMensagem('Falha ao carregar estoque', 'erro');
-        atualizarTabela([]); // Força tabela vazia
-    }finally {
+        atualizarTabela([]);
+    } finally {
         esconderCarregamento();
     }
 }
@@ -109,9 +105,8 @@ async function carregarItens() {
 // Atualização da tabela
 function atualizarTabela(itens) {
     const tbody = document.getElementById('corpoTabela');
-    tbody.innerHTML = ''; // Limpa a tabela
-    console.log('Itens recebidos para tabela:', itens);
-    // Se não houver itens, exibe mensagem
+    tbody.innerHTML = '';
+
     if (!itens || itens.length === 0) {
         tbody.innerHTML = `
             <tr>
@@ -121,13 +116,10 @@ function atualizarTabela(itens) {
         return;
     }
 
-    // Cria um fragmento de documento para otimizar a inserção
     const fragment = document.createDocumentFragment();
 
     itens.forEach(item => {
         const tr = document.createElement('tr');
-        
-        // Preenche as células da linha
         tr.innerHTML = `
             <td>${item.nome}</td>
             <td>${item.tipo}</td>
@@ -138,11 +130,10 @@ function atualizarTabela(itens) {
             <td>${new Date(item.data_entrada).toLocaleDateString('pt-BR')}</td>
             <td>${item.doador}</td>
         `;
-
         fragment.appendChild(tr);
     });
 
-    tbody.appendChild(fragment); // Insere todas as linhas de uma vez
+    tbody.appendChild(fragment);
 }
 
 // Remoção simplificada
@@ -188,6 +179,8 @@ async function carregarItensRemocao() {
         exibirMensagem('Erro ao carregar itens', 'erro');
     }
 }
+
+// Filtrar itens para remoção
 function filtrarItensRemocao() {
     const termoBusca = document.getElementById('buscaItem').value.toLowerCase();
     const select = document.getElementById('itemRemover');
@@ -216,6 +209,8 @@ function filtrarItensRemocao() {
         select.appendChild(option);
     }
 }
+
+// Evento de input na busca
 document.getElementById('buscaItem').addEventListener('input', filtrarItensRemocao);
 
 // Configuração inicial
@@ -239,9 +234,12 @@ function aplicarFiltros() {
         .map(option => option.value)
         .filter(v => v);
 
+    const tipos = Array.from(document.getElementById('filtroTipo').selectedOptions) // Novo
+        .map(option => option.value)
+        .filter(v => v);
+
     // Exibe os filtros selecionados no console para depuração
-    console.log('Tamanhos selecionados:', tamanhos);
-    console.log('Gêneros selecionados:', generos);
+    console.log('Filtros aplicados:', { tamanhos, generos, tipos });
 
     // Chama a função para carregar os itens com os filtros aplicados
     carregarItens();
@@ -252,15 +250,18 @@ function limparFiltros() {
     // Desmarca todas as opções selecionadas nos filtros
     document.getElementById('filtroTamanho').selectedIndex = -1;
     document.getElementById('filtroGenero').selectedIndex = -1;
+    document.getElementById('filtroTipo').selectedIndex = -1; // Novo
 
     // Recarrega os itens sem filtros
     carregarItens();
 }
 
+// Função para mostrar o spinner de carregamento
 function mostrarCarregamento() {
     document.getElementById('loading').style.display = 'flex';
 }
 
+// Função para esconder o spinner de carregamento
 function esconderCarregamento() {
     document.getElementById('loading').style.display = 'none';
 }

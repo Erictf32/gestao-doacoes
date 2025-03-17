@@ -45,7 +45,11 @@ app.post('/itens', (req, res) => {
 
     // Validação dos campos
     const validacoes = {
-        tipo: ['Calça', 'Camiseta', 'Blusa', 'Vestido', 'Tênis', 'Bota', 'Chinelo'],
+        tipo: [
+            'Calça', 'Camiseta', 'Tênis', 'Bota', 'Chinelo',
+            'Camisa', 'Shorts', 'Casaco', 'Moletom', 'Roupa Íntima',
+            'Pijama', 'Luva', 'Chapéu', 'Sapato' 
+        ],
         categoria: ['Frio', 'Calor'],
         genero: ['Masculino', 'Feminino', 'Unissex', 'Infantil'],
         tamanho: ['P', 'M', 'G', 'GG']
@@ -92,22 +96,31 @@ app.post('/itens', (req, res) => {
 
 // Listar todos os itens com filtros
 app.get('/itens', async (req, res) => {
-    const { tamanhos, generos } = req.query;
+    const { tamanhos, generos, tipos } = req.query;
 
     // Corrige parâmetros vazios
     const tamanhosArray = tamanhos ? tamanhos.split(',').filter(t => t) : null;
     const generosArray = generos ? generos.split(',').filter(g => g) : null;
+    const tiposArray = tipos ? tipos.split(',').filter(t => t) : null; // Novo filtro
 
     // Construção Dinâmica da Query
     let query = 'SELECT * FROM itens';
     const conditions = [];
     const params = [];
 
+    // Filtro por Tipo (novo)
+    if (tiposArray && tiposArray.length > 0) {
+        conditions.push(`tipo = ANY($${params.length + 1})`);
+        params.push(tiposArray);
+    }
+
+    // Filtro por Tamanho
     if (tamanhosArray && tamanhosArray.length > 0) {
         conditions.push(`tamanho = ANY($${params.length + 1})`);
         params.push(tamanhosArray);
     }
 
+    // Filtro por Gênero
     if (generosArray && generosArray.length > 0) {
         conditions.push(`genero = ANY($${params.length + 1})`);
         params.push(generosArray);
@@ -119,14 +132,13 @@ app.get('/itens', async (req, res) => {
 
     query += ' ORDER BY data_entrada DESC';
 
-    try {
-        // Executar consulta principal
-        const resultItens = await pool.query(query, params);
-        
-        res.json({
-            itens: resultItens.rows
-        });
+    // Logs para depuração
+    console.log('Query Final:', query);
+    console.log('Parâmetros:', params);
 
+    try {
+        const resultItens = await pool.query(query, params);
+        res.json({ itens: resultItens.rows });
     } catch (err) {
         console.error('Erro no servidor:', err);
         res.status(500).json({ 
