@@ -31,7 +31,6 @@ document.getElementById('formDoacao').addEventListener('submit', async (e) => {
     const novoItem = {
         item: document.getElementById('item').value,
         tipo: document.getElementById('tipo').value,
-        categoria: document.getElementById('categoria').value,
         genero: document.getElementById('genero').value,
         tamanho: document.getElementById('tamanho').value,
         dataEntrada: document.getElementById('dataEntrada').value,
@@ -61,26 +60,14 @@ document.getElementById('formDoacao').addEventListener('submit', async (e) => {
 });
 
 // Carregamento do estoque com filtros
-async function carregarItens() {
+async function carregarItens(tamanhos = [], generos = [], tipos = [], doador = '') {
     mostrarCarregamento();
     try {
-        // Coletar valores dos TRÊS filtros
-        const tamanhos = Array.from(document.getElementById('filtroTamanho').selectedOptions)
-            .map(option => option.value)
-            .filter(v => v);
-
-        const generos = Array.from(document.getElementById('filtroGenero').selectedOptions)
-            .map(option => option.value)
-            .filter(v => v);
-
-        const tipos = Array.from(document.getElementById('filtroTipo').selectedOptions) // Novo
-            .map(option => option.value)
-            .filter(v => v);
-
         const params = new URLSearchParams();
         if (tamanhos.length > 0) params.append('tamanhos', tamanhos.join(','));
         if (generos.length > 0) params.append('generos', generos.join(','));
-        if (tipos.length > 0) params.append('tipos', tipos.join(',')); // Novo
+        if (tipos.length > 0) params.append('tipos', tipos.join(','));
+        if (doador) params.append('doador', doador); // Novo filtro
 
         const response = await fetch(`http://localhost:3000/itens?${params}`);
         
@@ -123,7 +110,6 @@ function atualizarTabela(itens) {
         tr.innerHTML = `
             <td>${item.nome}</td>
             <td>${item.tipo}</td>
-            <td>${item.categoria}</td>
             <td>${item.genero}</td>
             <td>${item.tamanho}</td>
             <td>${item.descricao || '-'}</td>
@@ -143,23 +129,28 @@ document.getElementById('formRemocao').addEventListener('submit', async (e) => {
     const itemId = document.getElementById('itemRemover').value;
     if(!itemId) return exibirMensagem('Selecione um item', 'erro');
 
+    const destino = prompt('Para onde este item será doado?');
+    if(!destino) return exibirMensagem('É necessário informar o destino da doação', 'erro');
+
     const itemSelecionado = document.getElementById('itemRemover').selectedOptions[0].textContent;
     
-    // Confirmação reforçada
-    const confirmacao = confirm(`⚠️ ATENÇÃO!\n\nTem certeza que deseja remover permanentemente:\n"${itemSelecionado}"?\n\nEsta ação não pode ser desfeita!`);
+    const confirmacao = confirm(`⚠️ ATENÇÃO!\n\nTem certeza que deseja doar:\n"${itemSelecionado}"\npara "${destino}"?\n\nEsta ação não pode ser desfeita!`);
     
     if(!confirmacao) {
-        return exibirMensagem('❌ Item NÃO removido: Ação cancelada pelo usuário', 'aviso');
+        return exibirMensagem('❌ Item NÃO doado: Ação cancelada pelo usuário', 'aviso');
     }
 
     try {
+        // Alterado para DELETE e enviar destino no body
         const response = await fetch(`http://localhost:3000/itens/${itemId}`, {
-            method: 'DELETE'
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ destino })
         });
 
         if(!response.ok) throw new Error('Falha na comunicação com o servidor');
         
-        exibirMensagem('✅ Item removido com sucesso!');
+        exibirMensagem('✅ Item doado com sucesso!');
         carregarItensRemocao();
         carregarItens();
         
@@ -167,6 +158,7 @@ document.getElementById('formRemocao').addEventListener('submit', async (e) => {
         exibirMensagem(`❌ Erro crítico: ${error.message}`, 'erro');
     }
 });
+
 let todosItensRemocao = [];
 // Carregar itens para remoção
 async function carregarItensRemocao() {
@@ -228,21 +220,23 @@ function aplicarFiltros() {
     // Coleta os valores selecionados nos filtros
     const tamanhos = Array.from(document.getElementById('filtroTamanho').selectedOptions)
         .map(option => option.value)
-        .filter(v => v); // Remove valores vazios
+        .filter(v => v);
 
     const generos = Array.from(document.getElementById('filtroGenero').selectedOptions)
         .map(option => option.value)
         .filter(v => v);
 
-    const tipos = Array.from(document.getElementById('filtroTipo').selectedOptions) // Novo
+    const tipos = Array.from(document.getElementById('filtroTipo').selectedOptions)
         .map(option => option.value)
         .filter(v => v);
 
+    const doador = document.getElementById('filtroDoador').value.trim(); // Novo filtro
+
     // Exibe os filtros selecionados no console para depuração
-    console.log('Filtros aplicados:', { tamanhos, generos, tipos });
+    console.log('Filtros aplicados:', { tamanhos, generos, tipos, doador });
 
     // Chama a função para carregar os itens com os filtros aplicados
-    carregarItens();
+    carregarItens(tamanhos, generos, tipos, doador);
 }
 
 // Função para limpar os filtros
@@ -250,7 +244,7 @@ function limparFiltros() {
     // Desmarca todas as opções selecionadas nos filtros
     document.getElementById('filtroTamanho').selectedIndex = -1;
     document.getElementById('filtroGenero').selectedIndex = -1;
-    document.getElementById('filtroTipo').selectedIndex = -1; // Novo
+    document.getElementById('filtroTipo').selectedIndex = -1;
 
     // Recarrega os itens sem filtros
     carregarItens();
@@ -265,3 +259,55 @@ function mostrarCarregamento() {
 function esconderCarregamento() {
     document.getElementById('loading').style.display = 'none';
 }
+
+// Função para gerar relatório
+async function gerarRelatorio(event) {
+    event.preventDefault();
+    mostrarCarregamento();
+
+    const dataInicio = document.getElementById('dataInicio').value;
+    const dataFim = document.getElementById('dataFim').value;
+
+    try {
+        // Buscar dados do relatório
+        const response = await fetch(`http://localhost:3000/relatorio?dataInicio=${dataInicio}&dataFim=${dataFim}`);
+        
+        if (!response.ok) {
+            throw new Error('Erro ao gerar relatório');
+        }
+
+        const dados = await response.json();
+        
+        // Atualizar cards de resumo
+        document.getElementById('totalRecebidas').textContent = dados.totalRecebidas;
+        document.getElementById('totalRealizadas').textContent = dados.totalRealizadas;
+
+        // Atualizar tabela de detalhes
+        const tbody = document.getElementById('corpoTabelaRelatorio');
+        tbody.innerHTML = '';
+
+        dados.itens.forEach(item => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${item.nome}</td>
+                <td>${item.tipo}</td>
+                <td>${new Date(item.data_entrada).toLocaleDateString('pt-BR')}</td>
+                <td>${item.data_saida ? new Date(item.data_saida).toLocaleDateString('pt-BR') : '-'}</td>
+                <td>${item.destino || '-'}</td>
+                <td>${item.status}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        exibirMensagem('Relatório gerado com sucesso!');
+
+    } catch (error) {
+        console.error('Erro:', error);
+        exibirMensagem('Erro ao gerar relatório', 'erro');
+    } finally {
+        esconderCarregamento();
+    }
+}
+
+// Adicionar event listener para o formulário de relatório
+document.getElementById('formRelatorio')?.addEventListener('submit', gerarRelatorio);
