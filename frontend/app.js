@@ -94,6 +94,12 @@ function atualizarTabela(itens) {
     const tbody = document.getElementById('corpoTabela');
     tbody.innerHTML = '';
 
+    // Atualizar o contador de itens
+    const contadorElement = document.getElementById('totalItensEstoque');
+    if (contadorElement) {
+        contadorElement.textContent = itens.length.toString();
+    }
+
     if (!itens || itens.length === 0) {
         tbody.innerHTML = `
             <tr>
@@ -122,35 +128,51 @@ function atualizarTabela(itens) {
     tbody.appendChild(fragment);
 }
 
+
 // Remoção simplificada
 document.getElementById('formRemocao').addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const itemId = document.getElementById('itemRemover').value;
-    if(!itemId) return exibirMensagem('Selecione um item', 'erro');
+    const select = document.getElementById('itemRemover');
+    const selectedItems = Array.from(select.selectedOptions).map(option => ({
+        id: option.value,
+        nome: option.textContent
+    }));
 
-    const destino = prompt('Para onde este item será doado?');
-    if(!destino) return exibirMensagem('É necessário informar o destino da doação', 'erro');
+    if (selectedItems.length === 0) {
+        return exibirMensagem('Selecione pelo menos um item', 'erro');
+    }
 
-    const itemSelecionado = document.getElementById('itemRemover').selectedOptions[0].textContent;
+    const destino = prompt('Para onde estes itens serão doados?');
+    if (!destino) {
+        return exibirMensagem('É necessário informar o destino da doação', 'erro');
+    }
+
+    const itemsText = selectedItems.map(item => `- ${item.nome}`).join('\n');
+    const confirmacao = confirm(
+        `⚠️ ATENÇÃO!\n\n` +
+        `Tem certeza que deseja doar os seguintes itens para "${destino}"?\n\n` +
+        `${itemsText}\n\n` +
+        `Esta ação não pode ser desfeita!`
+    );
     
-    const confirmacao = confirm(`⚠️ ATENÇÃO!\n\nTem certeza que deseja doar:\n"${itemSelecionado}"\npara "${destino}"?\n\nEsta ação não pode ser desfeita!`);
-    
-    if(!confirmacao) {
-        return exibirMensagem('❌ Item NÃO doado: Ação cancelada pelo usuário', 'aviso');
+    if (!confirmacao) {
+        return exibirMensagem('❌ Itens NÃO doados: Ação cancelada pelo usuário', 'aviso');
     }
 
     try {
-        // Alterado para DELETE e enviar destino no body
-        const response = await fetch(`http://localhost:3000/itens/${itemId}`, {
-            method: 'DELETE',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ destino })
-        });
+        // Processar cada item selecionado
+        const promises = selectedItems.map(item => 
+            fetch(`http://localhost:3000/itens/${item.id}`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ destino })
+            })
+        );
 
-        if(!response.ok) throw new Error('Falha na comunicação com o servidor');
+        await Promise.all(promises);
         
-        exibirMensagem('✅ Item doado com sucesso!');
+        exibirMensagem(`✅ ${selectedItems.length} itens doados com sucesso!`);
         carregarItensRemocao();
         carregarItens();
         
@@ -259,7 +281,10 @@ function mostrarCarregamento() {
 function esconderCarregamento() {
     document.getElementById('loading').style.display = 'none';
 }
-
+let dadosRelatorio = {
+    recebidas: [],
+    realizadas: []
+};
 // Função para gerar relatório
 async function gerarRelatorio(event) {
     event.preventDefault();
@@ -269,7 +294,6 @@ async function gerarRelatorio(event) {
     const dataFim = document.getElementById('dataFim').value;
 
     try {
-        // Buscar dados do relatório
         const response = await fetch(`http://localhost:3000/relatorio?dataInicio=${dataInicio}&dataFim=${dataFim}`);
         
         if (!response.ok) {
@@ -278,28 +302,21 @@ async function gerarRelatorio(event) {
 
         const dados = await response.json();
         
+        // Armazenar dados separadamente
+        dadosRelatorio = {
+            recebidas: dados.itens.filter(item => item.status === 'Recebido'),
+            realizadas: dados.itens.filter(item => item.status === 'Doado')
+        };
+        
         // Atualizar cards de resumo
         document.getElementById('totalRecebidas').textContent = dados.totalRecebidas;
         document.getElementById('totalRealizadas').textContent = dados.totalRealizadas;
 
-        // Atualizar tabela de detalhes
-        const tbody = document.getElementById('corpoTabelaRelatorio');
-        tbody.innerHTML = '';
-
-        dados.itens.forEach(item => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${item.nome}</td>
-                <td>${item.tipo}</td>
-                <td>${new Date(item.data_entrada).toLocaleDateString('pt-BR')}</td>
-                <td>${item.data_saida ? new Date(item.data_saida).toLocaleDateString('pt-BR') : '-'}</td>
-                <td>${item.destino || '-'}</td>
-                <td>${item.status}</td>
-            `;
-            tbody.appendChild(tr);
-        });
-
-        exibirMensagem('Relatório gerado com sucesso!');
+        // Mostrar todos os dados inicialmente
+        atualizarTabelaRelatorio([...dadosRelatorio.recebidas, ...dadosRelatorio.realizadas]);
+        
+        // Ativar botão "Todos"
+        ativarBotaoFiltro('btnTodos');
 
     } catch (error) {
         console.error('Erro:', error);
@@ -308,6 +325,177 @@ async function gerarRelatorio(event) {
         esconderCarregamento();
     }
 }
+function atualizarTabelaRelatorio(itens) {
+    const tbody = document.getElementById('corpoTabelaRelatorio');
+    tbody.innerHTML = '';
 
+    if (!itens || itens.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="sem-itens">Nenhum item encontrado</td></tr>';
+        return;
+    }
+
+    itens.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td>${item.nome}</td>
+            <td>${item.tipo}</td>
+            <td>${new Date(item.data_entrada).toLocaleDateString('pt-BR')}</td>
+            <td>${item.data_saida ? new Date(item.data_saida).toLocaleDateString('pt-BR') : '-'}</td>
+            <td>${item.destino || '-'}</td>
+            <td>${item.status}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function ativarBotaoFiltro(btnId) {
+    document.querySelectorAll('.btn-filtro').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.getElementById(btnId).classList.add('active');
+}
+// Event Listeners para os botões de filtro
+document.getElementById('btnTodos').addEventListener('click', () => {
+    atualizarTabelaRelatorio([...dadosRelatorio.recebidas, ...dadosRelatorio.realizadas]);
+    ativarBotaoFiltro('btnTodos');
+});
+
+document.getElementById('btnRecebidas').addEventListener('click', () => {
+    atualizarTabelaRelatorio(dadosRelatorio.recebidas);
+    ativarBotaoFiltro('btnRecebidas');
+});
+
+document.getElementById('btnRealizadas').addEventListener('click', () => {
+    atualizarTabelaRelatorio(dadosRelatorio.realizadas);
+    ativarBotaoFiltro('btnRealizadas');
+});
+
+
+async function gerarPDFEstruturado() {
+    try {
+        // Obter dados da tabela
+        const tabela = document.getElementById('corpoTabelaRelatorio');
+        const linhas = Array.from(tabela.getElementsByTagName('tr'));
+
+        // Preparar dados para o PDF
+        const dadosTabela = linhas.map(linha => {
+            return Array.from(linha.getElementsByTagName('td')).map(celula => celula.textContent);
+        });
+
+        // Obter totais
+        const totalRecebidas = document.getElementById('totalRecebidas').textContent;
+        const totalRealizadas = document.getElementById('totalRealizadas').textContent;
+
+        // Definir colunas da tabela
+        const colunas = ['Item', 'Tipo', 'Data Entrada', 'Data Saída', 'Destino', 'Status'];
+
+        // Configurar documento PDF
+        const docDefinition = {
+            pageSize: 'A4',
+            pageOrientation: 'landscape',
+            pageMargins: [40, 60, 40, 60],
+            header: {
+                text: 'Relatório de Doações - Garimpando o Amor',
+                alignment: 'center',
+                margin: [0, 20],
+                fontSize: 16,
+                bold: true
+            },
+            footer: function(currentPage, pageCount) {
+                return {
+                    text: `Página ${currentPage} de ${pageCount}`,
+                    alignment: 'center',
+                    margin: [0, 20]
+                };
+            },
+            content: [
+                // Data do relatório
+                {
+                    text: `Data de geração: ${new Date().toLocaleDateString('pt-BR')} ${new Date().toLocaleTimeString('pt-BR')}`,
+                    alignment: 'right',
+                    margin: [0, 0, 0, 20]
+                },
+                // Resumo
+                {
+                    columns: [
+                        {
+                            width: '*',
+                            text: [
+                                { text: 'Total de Doações Recebidas\n', bold: true },
+                                { text: totalRecebidas, fontSize: 20 }
+                            ],
+                            alignment: 'center',
+                            margin: [0, 0, 10, 20]
+                        },
+                        {
+                            width: '*',
+                            text: [
+                                { text: 'Total de Doações Realizadas\n', bold: true },
+                                { text: totalRealizadas, fontSize: 20 }
+                            ],
+                            alignment: 'center',
+                            margin: [0, 0, 0, 20]
+                        }
+                    ]
+                },
+                // Título da tabela
+                {
+                    text: 'Detalhamento das Doações',
+                    fontSize: 14,
+                    bold: true,
+                    margin: [0, 20, 0, 10]
+                },
+                // Tabela de dados
+                {
+                    table: {
+                        headerRows: 1,
+                        widths: ['*', '*', 'auto', 'auto', '*', 'auto'],
+                        body: [
+                            // Cabeçalho
+                            colunas.map(coluna => ({
+                                text: coluna,
+                                bold: true,
+                                fillColor: '#4CAF50',
+                                color: '#FFFFFF'
+                            })),
+                            // Dados
+                            ...dadosTabela
+                        ]
+                    },
+                    layout: {
+                        hLineWidth: function() { return 1; },
+                        vLineWidth: function() { return 1; },
+                        hLineColor: function() { return '#ddd'; },
+                        vLineColor: function() { return '#ddd'; },
+                        fillColor: function(i) {
+                            return (i % 2 === 0) ? '#f9f9f9' : null;
+                        }
+                    }
+                }
+            ],
+            styles: {
+                header: {
+                    fontSize: 18,
+                    bold: true,
+                    margin: [0, 0, 0, 10]
+                }
+            },
+            defaultStyle: {
+                fontSize: 10
+            }
+        };
+
+        // Gerar e baixar o PDF
+        pdfMake.createPdf(docDefinition).download('relatorio-doacoes.pdf');
+        exibirMensagem('PDF gerado com sucesso!');
+
+    } catch (error) {
+        console.error('Erro ao gerar PDF:', error);
+        exibirMensagem('Erro ao gerar PDF', 'erro');
+    }
+}
 // Adicionar event listener para o formulário de relatório
-document.getElementById('formRelatorio')?.addEventListener('submit', gerarRelatorio);
+document.getElementById('formRelatorio').addEventListener('submit', gerarRelatorio);
+document.getElementById('btnExportarPDF').addEventListener('click', gerarPDFEstruturado);
+// Adicionar event listener para o formulário de relatório
+//document.getElementById('formRelatorio')?.addEventListener('submit', gerarRelatorio);

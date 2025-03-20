@@ -1,40 +1,62 @@
 :root {
-    --cor-primaria: #4CAF50;       /* Verde principal */
-    --cor-secundaria: #45a049;     /* Verde escuro */
+    --cor-primaria: #3121df;       /* Verde principal */
+    --cor-secundaria: #4437d8;     /* Verde escuro */
     --cor-fundo: #f5f5f5;          /* Fundo claro */
     --cor-texto: #333;             /* Texto escuro */
     --cor-borda: #ddd;             /* Bordas suaves */
     --transition: 0.3s;
 }
+.titulo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    padding: 30px;
+    margin-bottom: 30px;
+    background: #000080; /* Dark blue background to match the logo */
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
 
+.titulo-container img {
+    height: 180px !important;
+    width: auto;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+}
+
+.titulo-container img:hover {
+    transform: scale(1.05);
+}
 #titulo_princ {
-    font-size: 3rem;
-    color: var(--cor-primaria);
+    font-size: 2.5rem;
     text-align: center;
-    margin: 20px 0;
+    margin: 0;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 3px;
+    letter-spacing: 2px;
     font-family: 'Poppins', sans-serif;
     position: relative;
-    display: inline-block;
-    left: 50%;
-    transform: translateX(-50%);
-    background: linear-gradient(45deg, #5ac95e, #2196F3);
+    background:#ffffff; 
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
-    animation: fadeIn 1s ease-out;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    line-height: 1.5; 
+    transform: none;
+    left: 0;
 }
 
 #titulo_princ::after {
     content: '';
     display: block;
-    width: 80px;
+    width: 100px;
     height: 4px;
-    background-color: var(--cor-primaria);
-    margin: 10px auto 0;
+    background: linear-gradient(45deg, #ffffff, #a0d8ef);
+    margin: 15px auto 0; /* Centraliza o elemento horizontalmente */
     border-radius: 2px;
+    left: 5%; /* Posiciona o elemento no meio do título */
+    /*transform: translateX(-50%); /* Ajusta a posição para centralizar */
+    position: relative; /* Garante que o transform funcione corretamente */
 }
 
 @keyframes fadeIn {
@@ -92,17 +114,22 @@ button {
     padding: 10px 20px;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.3s; 
+    transition: transform 1s;
 }
 
 button:hover {
-    background-color: var(--cor-secundaria);
+    background-color: var(--cor-secundaria);   
 }
 
 #estoque {
     margin-top: 10px;
 }
-
+#formDoacao button[type="submit"]:hover {
+    background-color: var(--cor-secundaria);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra suave */
+}
 #mensagens {
     position: fixed;
     top: 20px;
@@ -159,7 +186,7 @@ th {
 }
 
 tr:hover {
-    background-color: rgba(76, 175, 80, 0.1);
+    background-color: rgba(84, 76, 175, 0.1);
 }
 
 .btn-atualizar {
@@ -167,6 +194,10 @@ tr:hover {
     background-color: #2196F3;
     border: none;
     margin-left: 10px;
+    transition: 0.4s;
+}
+.btn-atualizar:hover {
+    background-color: #0164b6
 }
 
 @media (max-width: 600px) {
@@ -218,7 +249,7 @@ tr:hover {
 .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
     border-color: var(--cor-primaria);
     outline: none;
-    box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+    box-shadow: 0 0 5px rgba(91, 76, 175, 0.3);
 }
 
 #formDoacao button {
@@ -267,7 +298,7 @@ textarea {
 .aba-link:hover, .aba-link.active {
     color: var(--cor-primaria);
     border-bottom: 3px solid var(--cor-primaria);
-    background-color: rgba(76, 175, 80, 0.1);
+    background-color: rgba(91, 76, 175, 0.1);
 }
 
 .aba-link.active {
@@ -288,6 +319,7 @@ textarea {
 
 .btn-remover {
     background-color: #f44336 !important;
+    transition: 0.3s;
 }
 
 .btn-remover:hover {
@@ -360,7 +392,7 @@ select option[value="Infantil"] {
 
 #buscaItem:focus {
     border-color: var(--cor-secundaria);
-    box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+    box-shadow: 0 0 8px rgba(91, 76, 175, 0.3);
 }
 
 #buscaItem::placeholder {
@@ -385,7 +417,7 @@ select option[value="Infantil"] {
 
 #itemRemover:focus {
     border-color: var(--cor-secundaria);
-    box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+    box-shadow: 0 0 8px rgba(91, 76, 175, 0.3);
 }
 
 #itemRemover option {
@@ -395,7 +427,7 @@ select option[value="Infantil"] {
 }
 
 #itemRemover option:hover {
-    background-color: rgba(76, 175, 80, 0.1);
+    background-color: rgba(91, 76, 175, 0.1);
 }
 
 #itemRemover option:checked {
@@ -436,7 +468,7 @@ select[multiple] {
 
 select[multiple]:focus {
     border-color: var(--cor-secundaria);
-    box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+    box-shadow: 0 0 8px rgba(91, 76, 175, 0.3);
 }
 
 select[multiple] option {
@@ -447,7 +479,7 @@ select[multiple] option {
 }
 
 select[multiple] option:hover {
-    background-color: rgba(76, 175, 80, 0.1);
+    background-color: rgba(91, 76, 175, 0.1);
 }
 
 select[multiple] option:checked {
@@ -474,7 +506,7 @@ select[multiple] option:checked::after {
     display: inline-block;
     padding: 8px 12px;
     border-radius: 5px;
-    background-color: rgba(113, 230, 117, 0.152);
+    background-color: rgba(132, 113, 230, 0.152);
     transition: background-color var(--transition), color var(--transition);
 }
 
@@ -482,7 +514,7 @@ select[multiple] option:checked::after {
 .label-tipo:hover,
 .label-tamanho:hover,
 .label-genero:hover {
-    background-color: rgba(123, 239, 127, 0.2);
+    background-color: rgba(131, 123, 239, 0.2);
     color: var(--cor-secundaria);
 }
 
@@ -523,7 +555,7 @@ select[multiple] option:checked::after {
 }
 
 .btn-gerar-relatorio {
-    background-color: var(--cor-primaria);
+    background-color:rgb(241, 22, 22);
     color: white;
     padding: 12px 24px;
     border: none;
@@ -534,7 +566,7 @@ select[multiple] option:checked::after {
 }
 
 .btn-gerar-relatorio:hover {
-    background-color: var(--cor-secundaria);
+    background-color: rgb(169, 15, 15);
 }
 
 #tabelaRelatorio {
@@ -556,7 +588,7 @@ select[multiple] option:checked::after {
 }
 
 #tabelaRelatorio tr:hover {
-    background-color: rgba(76, 175, 80, 0.1);
+    background-color: rgba(91, 76, 175, 0.1);
 }
 
 /* Estilos para os Filtros - Modificado */
@@ -587,32 +619,70 @@ select[multiple] option:checked::after {
 /* Botões de ação */
 .botoes-acoes {
     margin-top: 10px;
-    justify-content: flex-end;
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+.acoes-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
 }
 
 .btn-filtrar, .btn-limpar {
+    background-color:  #2196F3;
     padding: 10px 20px;
     font-size: 14px;
     transition: transform 0.2s;
 }
 
 .btn-filtrar:hover, .btn-limpar:hover {
+    background-color:   #1976D2;
     transform: translateY(-2px);
 }
 
 @media (max-width: 768px) {
-    .filtro-linha {
+    .botoes-acoes {
         flex-direction: column;
         gap: 15px;
+        align-items: center;
     }
     
-    .filtro {
+    .acoes-container {
         width: 100%;
-        min-width: auto;
     }
     
-    .botoes-acoes {
+    .contador-estoque {
+        width: 100%;
         justify-content: center;
+    }
+    
+    .botoes-filtro {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .btn-filtrar, .btn-limpar {
+        flex: 1;
+    }
+    .titulo-container {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+
+    .titulo-container img {
+        height: 150px !important;
+    }
+
+    #titulo_princ {
+        font-size: 2rem;
+        text-align: center;
+    }
+
+    #titulo_princ::after {
+        margin: 15px auto 0;
     }
 }
 
@@ -628,7 +698,7 @@ select[multiple] option:checked::after {
 
 #filtroDoador:focus {
     border-color: var(--cor-secundaria);
-    box-shadow: 0 0 8px rgba(76, 175, 80, 0.3);
+    box-shadow: 0 0 8px rgba(91, 76, 175, 0.3);
 }
 
 #filtroDoador::placeholder {
@@ -647,11 +717,157 @@ select[multiple] option:checked::after {
     display: inline-block;
     padding: 8px 12px;
     border-radius: 5px;
-    background-color: rgba(113, 230, 117, 0.152);
+    background-color: rgba(119, 113, 230, 0.152);
     transition: background-color var(--transition), color var(--transition);
 }
 
 .label-doador:hover {
-    background-color: rgba(123, 239, 127, 0.2);
+    background-color: rgba(123, 123, 239, 0.2);
     color: var(--cor-secundaria);
+}
+
+/* Ajustes para seleção múltipla */
+#itemRemover {
+    width: 100%;
+    max-height: 300px;
+    padding: 10px;
+    border: 2px solid var(--cor-primaria);
+    border-radius: 10px;
+    font-size: 16px;
+    background-color: white;
+    outline: none;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    appearance: none;
+    overflow-y: auto;
+}
+
+#itemRemover option {
+    padding: 12px;
+    border-bottom: 1px solid var(--cor-borda);
+    transition: background-color 0.3s;
+    cursor: pointer;
+}
+
+#itemRemover option:hover {
+    background-color: rgba(86, 76, 175, 0.1);
+}
+
+#itemRemover option:checked {
+    background-color: var(--cor-primaria);
+    color: white;
+    font-weight: bold;
+}
+
+/* Estilo para indicar que é possível selecionar múltiplos */
+.form-group label[for="itemRemover"] {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--cor-primaria);
+    font-size: 0.9em;
+    margin-bottom: 10px;
+}
+
+.form-group label[for="itemRemover"]::after {
+    content: '(CTRL + clique para selecionar múltiplos)';
+    font-size: 0.8em;
+    color: #666;
+    font-style: italic;
+}
+
+/* Estilos para os botões de filtro e exportação */
+.controles-relatorio {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+    gap: 20px;
+}
+
+.botoes-filtro {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.btn-filtro {
+    padding: 10px 20px;
+    border: 2px solid var(--cor-primaria);
+    background-color: white;
+    color: var(--cor-primaria);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-filtro:hover {
+    background-color: rgba(84, 76, 175, 0.1);
+}
+
+.btn-filtro.active {
+    background-color: var(--cor-primaria);
+    color: white;
+}
+
+.btn-exportar {
+    padding: 10px 20px;
+    background-color: #2196F3;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s;
+}
+
+.btn-exportar:hover {
+    background-color: #1976D2;
+}
+
+.btn-exportar i {
+    font-size: 1.2em;
+}
+
+/* Ajuste para impressão/PDF */
+@media print {
+    body * {
+        visibility: hidden;
+    }
+    #resultadoRelatorio, #resultadoRelatorio * {
+        visibility: visible;
+    }
+    #resultadoRelatorio {
+        position: absolute;
+        left: 0;
+        top: 0;
+    }
+    .controles-relatorio {
+        display: none;
+    }
+}
+.contador-estoque {
+    background-color:#2196F3;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 14px;
+    margin: 0;
+    text-align: center;
+    min-width: 300px;
+}
+
+.contador-numero {
+    font-size: 16px;
+    font-weight: bold;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 3px 10px;
+    border-radius: 15px;
+    min-width: 40px;
+    text-align: center;
 }

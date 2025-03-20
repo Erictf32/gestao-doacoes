@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
 <head>
     <meta charset="UTF-8">
@@ -7,10 +7,15 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
 </head>
 <body>
     <div class="container">
-        <h1 id="titulo_princ">Controle de Doações <br> Garimpando o Amor</h1>
+        <div class="titulo-container">
+            <img src="Logo-GarimpandoAmor.png" alt="Logo Garimpando o Amor" style="height: 120px; margin-right: 20px;">
+            <h1 id="titulo_princ">Controle de Doações<br>Garimpando Amor</h1>
+        </div>
         <div id="mensagens"></div>
 
         <!-- Menu de Abas -->
@@ -22,25 +27,25 @@
         </div>
         
         <!-- Aba de Cadastro -->
-<div id="cadastro" class="aba-conteudo active">
-    <div class="section">
-        <h2>Cadastrar Nova Doação</h2>
-        <form id="formDoacao">
-            <!-- Linha 1: Nome do Item e Tipo -->
-            <div class="form-row">
-                <div class="form-group"> <!-- Removido full-width -->
-                    <label for="item" style="margin-left:8px;">Nome do Item</label>
-                    <input type="text" id="item" placeholder="Ex: Macacão Infantil" required>
-                </div>
+        <div id="cadastro" class="aba-conteudo active">
+            <div class="section">
+                <h2>Cadastrar Nova Doação</h2>
+                <form id="formDoacao">
+                    <!-- Linha 1: Nome do Item e Tipo -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="item" style="margin-left:8px;">Nome do Item</label>
+                            <input type="text" id="item" placeholder="Ex: Macacão Infantil" required>
+                        </div>
 
-                <div class="form-group">
-                    <label for="tipo" style="margin-left: 8px;">Tipo</label>
-                    <select id="tipo" required>
-                        <option value="">Selecione o tipo...</option>
-                        <optgroup label="Roupas">
-                            <option>Calça</option>
-                            <option>Camiseta</option>
-                            <option>Camisa</option>
+                        <div class="form-group">
+                            <label for="tipo" style="margin-left: 8px;">Tipo</label>
+                            <select id="tipo" required>
+                                <option value="">Selecione o tipo...</option>
+                                <optgroup label="Roupas">
+                                    <option>Calça</option>
+                                    <option>Camiseta</option>
+                                    <option>Camisa</option>
                                     <option>Shorts</option> 
                                     <option>Casaco</option> 
                                     <option>Moletom</option> 
@@ -57,7 +62,6 @@
                                 </optgroup>
                             </select>
                         </div>
-
                     </div>
 
                     <!-- Linha 3: Gênero e Tamanho -->
@@ -80,6 +84,7 @@
                                 <option>M</option>
                                 <option>G</option>
                                 <option>GG</option>
+                                <option value="N/A">N/A (Não se aplica)</option>
                             </select>
                         </div>
                     </div>
@@ -106,7 +111,7 @@
 
                     <!-- Botão de Cadastro -->
                     <div class="form-row">
-                        <button type="submit">Cadastrar Doação</button>
+                        <button type="submit" id="btn-cadastro">Cadastrar Doação</button>
                     </div>
                 </form>
             </div>
@@ -119,7 +124,7 @@
             <button onclick="carregarItens()" class="btn-atualizar">↻ Atualizar</button>
         </h2>
 
-        <!-- Filtros de Estoque Modificados -->
+        <!-- Filtros de Estoque -->
         <div class="filtros-estoque">
             <!-- Linha 1: Tipo e Tamanho -->
             <div class="filtro-linha">
@@ -150,74 +155,83 @@
                         <option value="M">M</option>
                         <option value="G">G</option>
                         <option value="GG">GG</option>
+                        <option value="N/A">N/A (Não se aplica)</option>
                     </select>
                 </div>
             </div>
 
             <!-- Linha 2: Gênero e Doador -->
-    <div class="filtro-linha">
-        <div class="filtro">
-            <label class="label-genero">GÊNERO:</label>
-            <select id="filtroGenero" multiple>
-                <option>Masculino</option>
-                <option>Feminino</option>
-                <option>Unissex</option>
-                <option>Infantil</option>
-            </select>
-        </div>
+            <div class="filtro-linha">
+                <div class="filtro">
+                    <label class="label-genero">GÊNERO:</label>
+                    <select id="filtroGenero" multiple>
+                        <option>Masculino</option>
+                        <option>Feminino</option>
+                        <option>Unissex</option>
+                        <option>Infantil</option>
+                    </select>
+                </div>
 
-        <div class="filtro">
-            <label class="label-doador">DOADOR:</label>
-            <input 
-                type="text" 
-                id="filtroDoador" 
-                placeholder="Digite parte do nome do doador..."
-            />
-        </div>
-    </div>
+                <div class="filtro">
+                    <label class="label-doador">DOADOR:</label>
+                    <input 
+                        type="text" 
+                        id="filtroDoador" 
+                        placeholder="Digite parte do nome do doador..."
+                    />
+                </div>
+            </div>
 
             <!-- Botões de Ação -->
             <div class="filtro-linha botoes-acoes">
-                <button onclick="aplicarFiltros()" class="btn-filtrar">🔍 Aplicar Filtros</button>
-                <button onclick="limparFiltros()" class="btn-limpar">🗑️ Limpar</button>
-            </div>
-        </div>
-
-                <!-- Tabela de Estoque -->
-                <div class="tabela-container">
-                    <table id="tabelaEstoque">
-                        <thead>
-                            <tr>
-                                <th>Item</th>
-                                <th>Tipo</th>
-                                <th>Gênero</th>
-                                <th>Tamanho</th>
-                                <th>Descrição</th>
-                                <th>Data Entrada</th>
-                                <th>Doador</th>
-                            </tr>
-                        </thead>
-                        <tbody id="corpoTabela">
-                            <!-- Dados serão preenchidos via JavaScript -->
-                        </tbody>
-                    </table>
+                <div class="acoes-container">
+                    <div class="contador-estoque">
+                        <span>Total de itens em estoque: </span>
+                        <span id="totalItensEstoque" class="contador-numero">0</span>
+                    </div>
+                    <div class="botoes-filtro">
+                        <button onclick="aplicarFiltros()" class="btn-filtrar">🔍 Aplicar Filtros</button>
+                        <button onclick="limparFiltros()" class="btn-limpar">🗑️ Limpar</button>
+                    </div>
                 </div>
             </div>
         </div>
 
+        <!-- Tabela de Estoque -->
+        <div class="tabela-container">
+            <table id="tabelaEstoque">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Tipo</th>
+                        <th>Gênero</th>
+                        <th>Tamanho</th>
+                        <th>Descrição</th>
+                        <th>Data Entrada</th>
+                        <th>Doador</th>
+                    </tr>
+                </thead>
+                <tbody id="corpoTabela">
+                    <!-- Dados serão preenchidos via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
         <!-- Aba de Remoção -->
         <div id="remocao" class="aba-conteudo">
             <div class="section">
-                <h2>Remover Item do Estoque</h2>
+                <h2>Remover Itens do Estoque</h2>
                 <form id="formRemocao">
                     <div class="form-group">
-                        <label for="buscaItem">Buscar Item:</label>
+                        <label for="buscaItem">Buscar Itens:</label>
                         <input type="text" id="buscaItem" placeholder="Digite parte do nome do item...">
                     </div>
                     
                     <div class="form-group">
-                        <label for="itemRemover">Selecione o Item:</label>
-                        <select id="itemRemover" required size="8">
+                        <label for="itemRemover">Selecione os Itens (pressione CTRL para selecionar múltiplos):</label>
+                        <select id="itemRemover" required size="8" multiple>
                             <!-- Será preenchido via JavaScript -->
                         </select>
                     </div>
@@ -235,19 +249,11 @@
                     <div class="form-row">
                         <div class="form-group">
                             <label for="dataInicio">Data Inicial</label>
-                            <input 
-                                type="date" 
-                                id="dataInicio" 
-                                required 
-                            />
+                            <input type="date" id="dataInicio" required />
                         </div>
                         <div class="form-group">
                             <label for="dataFim">Data Final</label>
-                            <input 
-                                type="date" 
-                                id="dataFim" 
-                                required 
-                            />
+                            <input type="date" id="dataFim" required />
                         </div>
                     </div>
                     <div class="form-row">
@@ -267,6 +273,17 @@
                             <h3>Total de Doações Realizadas</h3>
                             <p id="totalRealizadas">0</p>
                         </div>
+                    </div>
+
+                    <div class="controles-relatorio">
+                        <div class="botoes-filtro">
+                            <button id="btnTodos" class="btn-filtro active">Todas Doações (Recebidas e Repassadas)</button>
+                            <button id="btnRecebidas" class="btn-filtro">Recebidas e não repassadas</button>
+                            <button id="btnRealizadas" class="btn-filtro">Apenas Realizadas</button>
+                        </div>
+                        <button id="btnExportarPDF" class="btn-exportar">
+                            <i class="fas fa-file-pdf"></i> Exportar PDF
+                        </button>
                     </div>
 
                     <div class="tabela-container">

@@ -50,7 +50,7 @@ app.post('/itens', (req, res) => {
             'Pijama', 'Luva', 'Chapéu', 'Sapato' 
         ],
         genero: ['Masculino', 'Feminino', 'Unissex', 'Infantil'],
-        tamanho: ['P', 'M', 'G', 'GG']
+        tamanho: ['P', 'M', 'G', 'GG', 'N/A']
     };
 
     try {
@@ -75,7 +75,7 @@ app.post('/itens', (req, res) => {
         nome,
         tipo,
         genero,
-        tamanho,
+        tamanho, 
         dataEntrada,
         doador,
         descricao || null
