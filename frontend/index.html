@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Doações</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="titulo-container">
+            <img src="Logo-GarimpandoAmor.png" alt="Logo Garimpando o Amor" style="height: 120px; margin-right: 20px;">
+            <h1 id="titulo_princ">Controle de Doações<br>Garimpando Amor</h1>
+        </div>
+        <div id="mensagens"></div>
+
+        <!-- Menu de Abas -->
+        <div class="abas-menu">
+            <button class="aba-link active" onclick="abrirAba(event, 'cadastro')">Nova Doação</button>
+            <button class="aba-link" onclick="abrirAba(event, 'estoque')">Estoque</button>
+            <button class="aba-link" onclick="abrirAba(event, 'remocao')">Remover Item</button>
+            <button class="aba-link" onclick="abrirAba(event, 'relatorio')">Relatório</button>
+        </div>
+        
+        <!-- Aba de Cadastro -->
+        <div id="cadastro" class="aba-conteudo active">
+            <div class="section">
+                <h2>Cadastrar Nova Doação</h2>
+                <form id="formDoacao">
+                    <!-- Linha 1: Nome do Item e Tipo -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="item" style="margin-left:8px;">Nome do Item</label>
+                            <input type="text" id="item" placeholder="Ex: Macacão Infantil" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="tipo" style="margin-left: 8px;">Tipo</label>
+                            <select id="tipo" required>
+                                <option value="">Selecione o tipo...</option>
+                                <optgroup label="Roupas">
+                                    <option>Calça</option>
+                                    <option>Camiseta</option>
+                                    <option>Camisa</option>
+                                    <option>Shorts</option> 
+                                    <option>Casaco</option> 
+                                    <option>Moletom</option> 
+                                    <option>Roupa Íntima</option> 
+                                    <option>Pijama</option> 
+                                    <option>Luva</option> 
+                                    <option>Chapéu</option> 
+                                </optgroup>
+                                <optgroup label="Calçados">
+                                    <option>Tênis</option>
+                                    <option>Bota</option>
+                                    <option>Chinelo</option>
+                                    <option>Sapato</option> 
+                                </optgroup>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Linha 3: Gênero e Tamanho -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="genero" style="margin-left: 8px;">Gênero</label>
+                            <select id="genero" required>
+                                <option value="">Selecione...</option>
+                                <option>Masculino</option>
+                                <option>Feminino</option>
+                                <option>Unissex</option>
+                                <option>Infantil</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="tamanho" style="margin-left: 8px;">Tamanho</label>
+                            <select id="tamanho" required>
+                                <option value="">Selecione...</option>
+                                <option>P</option>
+                                <option>M</option>
+                                <option>G</option>
+                                <option>GG</option>
+                                <option value="N/A">N/A (Não se aplica)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Linha 4: Data de Entrada e Doador -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dataEntrada" style="margin-left: 8px;">Data de Entrada</label>
+                            <input type="date" id="dataEntrada" required max="">
+                        </div>
+                        <div class="form-group">
+                            <label for="doador" style="margin-left: 8px;">Doador</label>
+                            <input type="text" id="doador" placeholder="Nome do doador" required>
+                        </div>
+                    </div>
+
+                    <!-- Linha 5: Descrição -->
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="descricao" style="margin-left: 8px;">Descrição (opcional)</label>
+                            <textarea id="descricao" rows="3" placeholder="Ex: Macacão azul com estampa de dinossauro"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Botão de Cadastro -->
+                    <div class="form-row">
+                        <button type="submit" id="btn-cadastro">Cadastrar Doação</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Aba de Estoque -->
+<div id="estoque" class="aba-conteudo">
+    <div class="section">
+        <h2>Estoque Atual 
+            <button onclick="carregarItens()" class="btn-atualizar">↻ Atualizar</button>
+        </h2>
+
+        <!-- Filtros de Estoque -->
+        <div class="filtros-estoque">
+            <!-- Linha 1: Tipo e Tamanho -->
+            <div class="filtro-linha">
+                <div class="filtro">
+                    <label class="label-tipo">TIPO:</label>
+                    <select id="filtroTipo" multiple>
+                        <option>Calça</option>
+                        <option>Camiseta</option>
+                        <option>Camisa</option> 
+                        <option>Shorts</option> 
+                        <option>Casaco</option> 
+                        <option>Moletom</option> 
+                        <option>Roupa Íntima</option> 
+                        <option>Pijama</option> 
+                        <option>Luva</option> 
+                        <option>Chapéu</option> 
+                        <option>Tênis</option>
+                        <option>Bota</option>
+                        <option>Chinelo</option>
+                        <option>Sapato</option> 
+                    </select>
+                </div>
+
+                <div class="filtro">
+                    <label class="label-tamanho">TAMANHO:</label>
+                    <select id="filtroTamanho" multiple>
+                        <option value="P">P</option>
+                        <option value="M">M</option>
+                        <option value="G">G</option>
+                        <option value="GG">GG</option>
+                        <option value="N/A">N/A (Não se aplica)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Linha 2: Gênero e Doador -->
+            <div class="filtro-linha">
+                <div class="filtro">
+                    <label class="label-genero">GÊNERO:</label>
+                    <select id="filtroGenero" multiple>
+                        <option>Masculino</option>
+                        <option>Feminino</option>
+                        <option>Unissex</option>
+                        <option>Infantil</option>
+                    </select>
+                </div>
+
+                <div class="filtro">
+                    <label class="label-doador">DOADOR:</label>
+                    <input 
+                        type="text" 
+                        id="filtroDoador" 
+                        placeholder="Digite parte do nome do doador..."
+                    />
+                </div>
+            </div>
+
+            <!-- Botões de Ação -->
+            <div class="filtro-linha botoes-acoes">
+                <div class="acoes-container">
+                    <div class="contador-estoque">
+                        <span>Total de itens em estoque: </span>
+                        <span id="totalItensEstoque" class="contador-numero">0</span>
+                    </div>
+                    <div class="botoes-filtro">
+                        <button onclick="aplicarFiltros()" class="btn-filtrar">🔍 Aplicar Filtros</button>
+                        <button onclick="limparFiltros()" class="btn-limpar">🗑️ Limpar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabela de Estoque -->
+        <div class="tabela-container">
+            <table id="tabelaEstoque">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>Tipo</th>
+                        <th>Gênero</th>
+                        <th>Tamanho</th>
+                        <th>Descrição</th>
+                        <th>Data Entrada</th>
+                        <th>Doador</th>
+                    </tr>
+                </thead>
+                <tbody id="corpoTabela">
+                    <!-- Dados serão preenchidos via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+        <!-- Aba de Remoção -->
+        <div id="remocao" class="aba-conteudo">
+            <div class="section">
+                <h2>Remover Itens do Estoque</h2>
+                <form id="formRemocao">
+                    <div class="form-group">
+                        <label for="buscaItem">Buscar Itens:</label>
+                        <input type="text" id="buscaItem" placeholder="Digite parte do nome do item...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="itemRemover">Selecione os Itens (pressione CTRL para selecionar múltiplos):</label>
+                        <select id="itemRemover" required size="8" multiple>
+                            <!-- Será preenchido via JavaScript -->
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn-remover">Confirmar Remoção</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Nova Aba de Relatório -->
+        <div id="relatorio" class="aba-conteudo">
+            <div class="section">
+                <h2>Relatório de Doações</h2>
+                <form id="formRelatorio" class="form-relatorio">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="dataInicio">Data Inicial</label>
+                            <input type="date" id="dataInicio" required />
+                        </div>
+                        <div class="form-group">
+                            <label for="dataFim">Data Final</label>
+                            <input type="date" id="dataFim" required />
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <button type="submit" class="btn-gerar-relatorio">
+                            Gerar Relatório
+                        </button>
+                    </div>
+                </form>
+
+                <div id="resultadoRelatorio" class="resultado-relatorio">
+                    <div class="resumo-relatorio">
+                        <div class="card-relatorio">
+                            <h3>Total de Doações Recebidas</h3>
+                            <p id="totalRecebidas">0</p>
+                        </div>
+                        <div class="card-relatorio">
+                            <h3>Total de Doações Realizadas</h3>
+                            <p id="totalRealizadas">0</p>
+                        </div>
+                    </div>
+
+                    <div class="controles-relatorio">
+                        <div class="botoes-filtro">
+                            <button id="btnTodos" class="btn-filtro active">Todas Doações (Recebidas e Repassadas)</button>
+                            <button id="btnRecebidas" class="btn-filtro">Recebidas e não repassadas</button>
+                            <button id="btnRealizadas" class="btn-filtro">Apenas Realizadas</button>
+                        </div>
+                        <button id="btnExportarPDF" class="btn-exportar">
+                            <i class="fas fa-file-pdf"></i> Exportar PDF
+                        </button>
+                    </div>
+
+                    <div class="tabela-container">
+                        <h3>Detalhamento das Doações</h3>
+                        <table id="tabelaRelatorio">
+                            <thead>
+                                <tr>
+                                    <th>Item</th>
+                                    <th>Tipo</th>
+                                    <th>Data Entrada</th>
+                                    <th>Data Saída</th>
+                                    <th>Destino</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="corpoTabelaRelatorio">
+                                <!-- Será preenchido via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Spinner de Carregamento -->
+        <div id="loading" class="loading-spinner" style="display: none;">
+            <i class="fas fa-spinner fa-spin"></i> Carregando...
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
